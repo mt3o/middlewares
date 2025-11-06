@@ -4,18 +4,42 @@
   "description": "",
   "main": "index.ts",
   "type": "module",
-  "scripts": {
-    "test": "vitest --run",
-    "test.watch": "vitest"
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/middleware-pipe.js",
+      "require": "./dist/middleware-pipe.cjs"
+    },
+    "./package.json": "./package.json"
   },
+  "license": "MIT",
   "private": true,
   "dependencies": {
-    "reflect-metadata": "^0.2.2",
-    "zod": "^3.24.2"
+  },
+  "author": {
+    "name": "Teodor Kulej",
+    "email": "mt3o@users.noreply.github.com",
+    "url": "https://github.com/mt3o"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build && tsc --declaration --emitDeclarationOnly --outDir dist --declarationMap true",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf coverage build out tmp"
   },
   "devDependencies": {
-    "tsx": "4.19.3",
-    "typescript": "^4.9.5",
-    "vitest": "^3.0.7"
+    "typescript": "~5.8.3",
+    "vite": "^7.2.1",
+    "vite-plugin-doctest": "^1.1.1",
+    "vitest": "^3.2.4",
+    "zod": "^3.25.76"
+  },
+  "peerDependencies": {
+    "zod": "^3.25.76"
   }
 }

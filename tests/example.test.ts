@@ -1,7 +1,10 @@
+import {describe, it, expect, vi} from 'vitest';
 import {z} from 'zod';
-import {Middleware, MiddlewareStack} from "../src/types";
-import {validateStack} from "../src/validate";
-import {composeStack} from "../src/registry";
+import {type Middleware, type MiddlewareStack} from "../src";
+import {validateStack} from "../src";
+import {composeStack} from "../src";
+
+const logger = vi.fn()
 
 // Define the domain object
 const DomainRequestSchema = z.object({
@@ -82,9 +85,9 @@ CreateDomainObjectMiddleware.Name = "CreateDomainObjectMiddleware";
 
 // Middleware to log request and response
 const LoggingMiddleware: Middleware<DomainRequest, DomainRequest, TranslateResponse, TranslateResponse> = async (input, next) => {
-    console.log('LOGGING Request:', input);
+    logger('LOGGING Request:', input);
     const response = await next(input);
-    console.log('LOGGING Response:', response);
+    logger('LOGGING Response:', response);
     return response;
 };
 LoggingMiddleware.MyArgType = DomainRequestSchema;
@@ -149,20 +152,35 @@ const stack: MiddlewareStack = [
     FetchApiDataMiddleware
 ];
 
+describe('Middleware Stack Example: Validation', () => {
+    it('builds and executes the stack', async () => {
 // Validate the stack
-const errors = validateStack(stack);
-if (errors.length > 0) {
-    console.error('Stack validation failed:', errors);
-} else {
-    // Compose and execute the stack
-    const composed = composeStack<DomainRequest, DomainResponse>(stack);
+        const errors = validateStack(stack);
 
-    console.log("*** Calling the stack ***");
-    const c = await composed({text: 'example'});
-    console.log("*** Called the stack ***\n");
+        expect(errors.length).toBe(0)
+        //else: console.error('Stack validation failed:', errors);
 
-    console.log("Highlighted text: ", c.highlightedText);
-    console.log("Response text: ", c.responseText);
-    console.log("User query: ", c.userQuery);
+        // Compose and execute the stack
+        const composed = composeStack<DomainRequest, DomainResponse>(stack);
 
-}
+        /**** Calling the stack ***");*/
+        const c = await composed({text: 'example'});
+        /**** Called the stack ***\n");*/
+
+        expect(c.highlightedText).toBe("<highlight>example</highlight>");
+        expect(c.responseText).toBe("example");
+        expect(c.userQuery).toBe("example");
+
+        expect(logger).toBeCalledTimes(2);
+        expect(logger).toBeCalledWith("LOGGING Request:", {
+            "text": "example"
+        });
+        expect(logger).toBeCalledWith("LOGGING Response:", {
+            "highlightedText": "<highlight>example</highlight>",
+            "responseText": "example",
+            "status": "OK",
+        },);
+
+
+    })
+})

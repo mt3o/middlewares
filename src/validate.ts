@@ -6,17 +6,22 @@ function isNever(value: any): boolean {
     return value === undefined || value === null;
 }
 
-export function validateStack<In, Out>(stack: MiddlewareStack<In,Out>) {
+/**
+ * Verify the whole stack of middlewares by checking if argument and return value of one middleware are compatible with another one in the stack.
+ * @param stack to be validated
+ * @param areEquivalent function that checks if one type overlaps another
+ */
+export function validateStack<In, Out>(stack: MiddlewareStack<In,Out>, areEquivalent = areTypesEquivalent) {
     const errors: Error[] = [];
     for (let i = 0; i <= stack.length - 2; i++) {
         const self = stack[i];
         const next = stack[i + 1];
 
-        if (!isNever(self.NextMiddlewareArg) && !areTypesEquivalent(next.MyArgType, self.NextMiddlewareArg)) {
+        if (!isNever(self.NextMiddlewareArg) && !areEquivalent(next.MyArgType, self.NextMiddlewareArg)) {
             errors.push(new Error(`Types don't match between self:${self.Name}.NextMiddlewareArg and next:${next.Name}.MyArgType argument type`));
         }
 
-        if (!areTypesEquivalent(self.NextMiddlewareReturnType, next.MyReturnType)) {
+        if (!areEquivalent(self.NextMiddlewareReturnType, next.MyReturnType)) {
             errors.push(new Error(`Types don't match between self:${self.Name}.NextMiddlewareReturnType and next:${next.Name}.MyReturnType output type`));
         }
 

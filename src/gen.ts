@@ -32,7 +32,7 @@ type GenMiddlewareCallable<
     resolve: (resolved: MyResolved)=>void
 ) => Promise<void>;
 
-type GenMiddleware <MyArg, NextArg, NextResponse, MyResolved>
+export type GenMiddleware <MyArg, NextArg, NextResponse, MyResolved>
     = GenMiddlewareCallable<MyArg, NextArg, NextResponse, MyResolved>
     & Validation<MyArg, NextArg, NextResponse, MyResolved>
     ;

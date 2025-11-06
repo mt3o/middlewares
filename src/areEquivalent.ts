@@ -1,7 +1,14 @@
 import {ZodObject, ZodSchema} from 'zod';
 
 /**
- * Check if B contains all keys of A, in other words A is a superset of B
+ * Check if A is superset of B. So: B contains all keys of A. Default implementation assumes that:
+ * A superset of B => true
+ * A subset of B => false
+ * A same as B => true
+ * A undefined and B undefined => true
+ * A undefined, B defined => false
+ * A defined, B undefined => true
+ * but you can provide your own validator if you dont want to rely on Zod but have your own type validation library
  */
 export function areTypesEquivalent<T, U>(a: ZodSchema<T>|undefined, b: ZodSchema<U>|undefined): boolean {
     if (a instanceof ZodObject && b instanceof ZodObject) {
