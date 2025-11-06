@@ -10,7 +10,21 @@ import {ZodObject, ZodSchema} from 'zod';
  * A defined, B undefined => true
  * but you can provide your own validator if you dont want to rely on Zod but have your own type validation library
  */
-export function areTypesEquivalent<T, U>(a: ZodSchema<T>|undefined, b: ZodSchema<U>|undefined): boolean {
+export function areTypesEquivalent<T, U>(
+    a: ZodSchema<T> | undefined,
+    b: ZodSchema<U> | undefined
+): boolean {
+    // Handle both undefined case
+    if (a === undefined && b === undefined) {
+        return true;
+    }
+
+    // Handle mismatched undefined cases
+    if ((a === undefined) !== (b === undefined)) {
+        return false;
+    }
+
+    // Both are defined at this point
     if (a instanceof ZodObject && b instanceof ZodObject) {
         const shapeA = a.shape;
         const shapeB = b.shape;
@@ -26,19 +40,5 @@ export function areTypesEquivalent<T, U>(a: ZodSchema<T>|undefined, b: ZodSchema
 
         return true;
     }
-
-    if(a == undefined && b != undefined || a != undefined && b == undefined) {
-        return false;
-    }
-    if(a == undefined || b == undefined){
-        return true;
-    }
-    try{
-            //@ts-ignore
-            return b._def?.typeName == a._def?.typeName;
-        }catch(e){
-        console.log('Not ZOD type in schema :/',e);
-        return false;
-    }
-
+    return true;
 }

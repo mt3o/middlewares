@@ -1,4 +1,4 @@
-import type {ExecutableStack, Middleware, MiddlewareCall, MiddlewareRegistry, MiddlewareStack} from "./types";
+import type {ExecutableStack, MiddlewareCall, MiddlewareRegistry, MiddlewareStack} from "./types";
 
 
 
@@ -20,32 +20,35 @@ import type {ExecutableStack, Middleware, MiddlewareCall, MiddlewareRegistry, Mi
  *  const response = await executable(request);
  *  ```
  */
-export async function getFromRegistry<Request,Response>(stack: string[], registry:MiddlewareRegistry){
-
+export async function getFromRegistry<Request, Response>(
+    stack: string[],
+    registry: MiddlewareRegistry
+): Promise<MiddlewareStack<Request, Response>> {
     const haystack = Object.keys(registry);
 
-    if(!stack.every(el=>haystack.includes(el))){
-        const missing = stack.filter(el=>!haystack.includes(el));
+    const missing = stack.filter((el) => !haystack.includes(el));
+    if (missing.length > 0) {
         throw new Error(`Missing middlewares in registry: ${missing.join(', ')}`);
     }
 
     // Extract middlewares from registry
-    const middlewares = stack.map(el=>registry[el]);
-    return (await Promise.all(middlewares)) as unknown as MiddlewareStack<Request,Response>;
-};
+    const middlewares = stack.map((el) => registry[el]);
+    return (await Promise.all(middlewares)) as unknown as MiddlewareStack<Request, Response>;
+}
 
 export function composeStack<Request, Response>(
-    stack: MiddlewareStack<Request,Response>,
-) : ExecutableStack<Request, Response> {
-
-
+    stack: MiddlewareStack<Request, Response>
+): ExecutableStack<Request, Response> {
     const composed = stack.reduceRight<MiddlewareCall<Request, Response>>(
-        (next, middleware) => async (req: Request) => await middleware(
-            req,
-            next as MiddlewareCall<any, Promise<any>> & MiddlewareCall<never, Promise<never>>
-        ),
-        async (_req: Request) => {return {} as Response},
+        (next, middleware) =>
+            async (req: Request) =>
+                await middleware(
+                    req,
+                    next as MiddlewareCall<unknown, Promise<unknown>> &
+                        MiddlewareCall<never, Promise<never>>
+                ),
+        async (_req: Request): Promise<Response> => ({} as Response)
     ) as unknown as ExecutableStack<Request, Response>;
 
-    return (req)=>composed(req);
+    return (req: Request): Promise<Response> => composed(req);
 }
