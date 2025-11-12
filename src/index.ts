@@ -1,5 +1,5 @@
 import {areTypesEquivalent} from './areEquivalent';
-import {composeStack, getFromRegistry} from './registry';
+import {composeStack, getFromRegistry, getGenFromRegistry} from './registry';
 import {validateStack} from './validate';
 import type {
     Middleware,
@@ -9,6 +9,13 @@ import type {
     MiddlewareProvider,
     ExecutableStack,
     MiddlewareStackItem,
+    GenMiddlewareStack,
+    GenMiddleware,
+    ExecutableGenStack,
+    NextGen,
+    GenStackItem,
+    GenMiddlewareProvider,
+    GenMiddlewareRegistry,
 } from './types';
 
 
@@ -16,6 +23,7 @@ export {
     areTypesEquivalent,
     composeStack,
     getFromRegistry,
+    getGenFromRegistry,
     validateStack,
     type Middleware,
     type MiddlewareStack,
@@ -24,4 +32,11 @@ export {
     type MiddlewareProvider,
     type ExecutableStack,
     type MiddlewareStackItem,
+    type GenMiddlewareStack,
+    type GenMiddleware,
+    type ExecutableGenStack,
+    type NextGen,
+    type GenStackItem,
+    type GenMiddlewareProvider,
+    type GenMiddlewareRegistry,
 }

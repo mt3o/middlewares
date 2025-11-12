@@ -1,5 +1,6 @@
-import { describe, it, expect, vi } from 'vitest';
-import { buildGenStack, type GenMiddleware, type GenMiddlewareStack } from '../src/gen';
+import { describe, it, expect } from 'vitest';
+import type {GenMiddleware, GenMiddlewareStack, NextGen} from "../src/types";
+import {composeGenStack} from "../src/registry";
 
 /**
  * Four-stack middleware test suite
@@ -9,6 +10,7 @@ import { buildGenStack, type GenMiddleware, type GenMiddlewareStack } from '../s
  * 3. DataProcessor - processes data with business logic
  * 4. DataFetcher - fetches final data (terminal middleware)
  */
+
 
 // Type definitions for the 4-stack pipeline
 type InitialRequest = {
@@ -48,6 +50,8 @@ type FetcherOutput = {
   result: number;
 };
 
+
+
 describe('Four-Stack GenMiddleware', () => {
   it('should execute a 4-layer middleware stack in correct order', async () => {
     const executionOrder: string[] = [];
@@ -58,14 +62,18 @@ describe('Four-Stack GenMiddleware', () => {
       LoggerOutput,
       ValidatorOutput,
       LoggerOutput
-    > = async (details, next, resolve) => {
+    > = async (
+        details:InitialRequest,
+        next: NextGen<LoggerOutput, ValidatorOutput>,
+        resolve: (arg:LoggerOutput)=>void
+    ) => {
       executionOrder.push('logger-start');
       const withTimestamp: LoggerOutput = {
         ...details,
         timestamp: Date.now(),
       };
 
-      next(withTimestamp, (response) => {
+      next(withTimestamp, (_response) => {
         executionOrder.push('logger-resolve');
         resolve(withTimestamp);
       });
@@ -84,7 +92,7 @@ describe('Four-Stack GenMiddleware', () => {
         validated: details.userId.length > 0 && details.action.length > 0,
       };
 
-      next(validated, (response) => {
+      next(validated, (_response) => {
         executionOrder.push('validator-resolve');
         resolve(validated);
       });
@@ -104,7 +112,7 @@ describe('Four-Stack GenMiddleware', () => {
         multiplier: 2,
       };
 
-      next(processed, (response) => {
+      next(processed, (_response) => {
         executionOrder.push('processor-resolve');
         resolve(processed);
       });
@@ -116,7 +124,11 @@ describe('Four-Stack GenMiddleware', () => {
       never,
       never,
       FetcherOutput
-    > = async (details, _next, resolve) => {
+    > = async (
+        details: ProcessorOutput,
+        _next: NextGen<never,never>,
+        resolve: (arg: FetcherOutput)=> void
+    ) => {
       executionOrder.push('fetcher-start');
       const result: FetcherOutput = {
         ...details,
@@ -127,19 +139,19 @@ describe('Four-Stack GenMiddleware', () => {
     };
 
     // Build the stack
-    const stack: GenMiddlewareStack<InitialRequest, FetcherOutput> = [
+    const stack: GenMiddlewareStack<InitialRequest, LoggerOutput> = [
       requestLogger,
       requestValidator,
       dataProcessor,
       dataFetcher,
     ];
 
-    const executable = buildGenStack(stack);
+    const executable = composeGenStack(stack);
 
     // Execute and capture result
-    const result = await new Promise<FetcherOutput>((done) => {
+    const result = await new Promise<LoggerOutput>((resolve) => {
       executable({ userId: 'user123', action: 'fetch' }, (output) => {
-        done(output);
+        resolve(output);
       });
     });
 
@@ -172,7 +184,7 @@ describe('Four-Stack GenMiddleware', () => {
     > = async (details, next, resolve) => {
       transformations.push(`layer1-in:${details.value}`);
       const transformed = { value: details.value + 1 };
-      next(transformed, (response) => {
+      next(transformed, (_response) => {
         transformations.push(`layer1-out:${transformed.value}`);
         resolve(transformed);
       });
@@ -186,7 +198,7 @@ describe('Four-Stack GenMiddleware', () => {
     > = async (details, next, resolve) => {
       transformations.push(`layer2-in:${details.value}`);
       const transformed = { value: details.value * 2 };
-      next(transformed, (response) => {
+      next(transformed, (_response) => {
         transformations.push(`layer2-out:${transformed.value}`);
         resolve(transformed);
       });
@@ -200,7 +212,7 @@ describe('Four-Stack GenMiddleware', () => {
     > = async (details, next, resolve) => {
       transformations.push(`layer3-in:${details.value}`);
       const transformed = { value: details.value + 10 };
-      next(transformed, (response) => {
+      next(transformed, (_response) => {
         transformations.push(`layer3-out:${transformed.value}`);
         resolve(transformed);
       });
@@ -225,7 +237,7 @@ describe('Four-Stack GenMiddleware', () => {
       layer4,
     ];
 
-    const executable = buildGenStack(stack);
+    const executable = composeGenStack(stack);
 
     const result = await new Promise<{ value: number }>((done) => {
       executable({ value: 5 }, (output) => {
@@ -251,7 +263,7 @@ describe('Four-Stack GenMiddleware', () => {
       asyncLog.push('layer1-start');
       await new Promise((r) => setTimeout(r, 10));
       asyncLog.push('layer1-continue');
-      next(details, (response) => {
+      next(details, (_response) => {
         asyncLog.push('layer1-resolve');
         resolve(details);
       });
@@ -266,7 +278,7 @@ describe('Four-Stack GenMiddleware', () => {
       asyncLog.push('layer2-start');
       await new Promise((r) => setTimeout(r, 10));
       asyncLog.push('layer2-continue');
-      next(details, (response) => {
+      next(details, (_response) => {
         asyncLog.push('layer2-resolve');
         resolve(details);
       });
@@ -281,7 +293,7 @@ describe('Four-Stack GenMiddleware', () => {
       asyncLog.push('layer3-start');
       await new Promise((r) => setTimeout(r, 10));
       asyncLog.push('layer3-continue');
-      next(details, (response) => {
+      next(details, (_response) => {
         asyncLog.push('layer3-resolve');
         resolve(details);
       });
@@ -306,7 +318,7 @@ describe('Four-Stack GenMiddleware', () => {
       asyncLayer4,
     ];
 
-    const executable = buildGenStack(stack);
+    const executable = composeGenStack(stack);
 
     const result = await new Promise<{ id: string }>((done) => {
       executable({ id: 'test-123' }, (output) => {
@@ -330,7 +342,7 @@ describe('Four-Stack GenMiddleware', () => {
     > = async (details, next, resolve) => {
       const isValid = details.value > 0;
       conditions.push(isValid);
-      next(details, (response) => {
+      next(details, (_response) => {
         resolve(details);
       });
     };
@@ -343,7 +355,7 @@ describe('Four-Stack GenMiddleware', () => {
     > = async (details, next, resolve) => {
       const isEven = details.value % 2 === 0;
       conditions.push(isEven);
-      next(details, (response) => {
+      next(details, (_response) => {
         resolve(details);
       });
     };
@@ -356,7 +368,7 @@ describe('Four-Stack GenMiddleware', () => {
     > = async (details, next, resolve) => {
       const isLarge = details.value > 100;
       conditions.push(isLarge);
-      next(details, (response) => {
+      next(details, (_response) => {
         resolve(details);
       });
     };
@@ -371,12 +383,14 @@ describe('Four-Stack GenMiddleware', () => {
       resolve({ value: details.value, allConditionsMet: allMet });
     };
 
-    const stack: GenMiddlewareStack<
-      { value: number },
-      { value: number; allConditionsMet: boolean }
-    > = [conditionalLayer1, conditionalLayer2, conditionalLayer3, conditionalLayer4];
+    const stack: GenMiddlewareStack = [
+        conditionalLayer1,
+        conditionalLayer2,
+        conditionalLayer3,
+        conditionalLayer4
+    ];
 
-    const executable = buildGenStack(stack);
+    const executable = composeGenStack(stack);
 
     const result = await new Promise<{ value: number; allConditionsMet: boolean }>(
       (done) => {
@@ -400,7 +414,7 @@ describe('Four-Stack GenMiddleware', () => {
       { data: string }
     > = async (details, next, resolve) => {
       errorLog.push('layer1');
-      next(details, (response) => {
+      next(details, (_response) => {
         resolve(details);
       });
     };
@@ -417,7 +431,7 @@ describe('Four-Stack GenMiddleware', () => {
         resolve(details);
         return;
       }
-      next(details, (response) => {
+      next(details, (_response) => {
         resolve(details);
       });
     };
@@ -429,7 +443,7 @@ describe('Four-Stack GenMiddleware', () => {
       { data: string }
     > = async (details, next, resolve) => {
       errorLog.push('layer3');
-      next(details, (response) => {
+      next(details, (_response) => {
         resolve(details);
       });
     };
@@ -449,7 +463,7 @@ describe('Four-Stack GenMiddleware', () => {
       { data: string; processed?: boolean }
     > = [errorLayer1, errorLayer2, errorLayer3, errorLayer4];
 
-    const executable = buildGenStack(stack);
+    const executable = composeGenStack(stack);
 
     const result = await new Promise<{
       data: string;
@@ -461,8 +475,10 @@ describe('Four-Stack GenMiddleware', () => {
     });
 
     expect(result.data).toBe('invalid');
-    expect(errorLog).toContain('layer1');
-    expect(errorLog).toContain('layer2');
-    expect(errorLog).toContain('layer2-error-detected');
+    expect(errorLog).toStrictEqual([
+        'layer1',
+        'layer2',
+        'layer2-error-detected'
+    ]);
   });
 });

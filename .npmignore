@@ -1,0 +1,6 @@
+tests/
+node_modules/
+.idea/
+tsconfig.json
+vite.config.ts
+vitest.config.ts

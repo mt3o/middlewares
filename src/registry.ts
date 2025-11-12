@@ -1,4 +1,8 @@
-import type {ExecutableStack, MiddlewareCall, MiddlewareRegistry, MiddlewareStack} from "./types";
+import type {
+    ExecutableGenStack,
+    ExecutableStack,
+    GenMiddlewareRegistry, GenMiddlewareStack, MiddlewareCall, MiddlewareRegistry, MiddlewareStack, NextGen
+} from "./types";
 
 
 
@@ -39,16 +43,58 @@ export async function getFromRegistry<Request, Response>(
 export function composeStack<Request, Response>(
     stack: MiddlewareStack<Request, Response>
 ): ExecutableStack<Request, Response> {
+
+    type LocalCall = MiddlewareCall<unknown, Promise<unknown>> & MiddlewareCall<never, Promise<never>>;
+
     const composed = stack.reduceRight<MiddlewareCall<Request, Response>>(
         (next, middleware) =>
             async (req: Request) =>
                 await middleware(
                     req,
-                    next as MiddlewareCall<unknown, Promise<unknown>> &
-                        MiddlewareCall<never, Promise<never>>
+                    next as LocalCall
                 ),
         async (_req: Request): Promise<Response> => ({} as Response)
     ) as unknown as ExecutableStack<Request, Response>;
 
     return (req: Request): Promise<Response> => composed(req);
+}
+
+
+
+export function composeGenStack<Request, Response>(
+    callstack: GenMiddlewareStack<Request, Response>
+): ExecutableGenStack<Request, Response> {
+
+    type LocalNext = NextGen<unknown, unknown> & NextGen<never, never>;
+
+    const composed = callstack.reduceRight<NextGen<Request, Response>>(
+        (next, middleware) =>
+            async (details, resolve) =>
+                await middleware(
+                    details,
+                    next as LocalNext,
+                    resolve as (resolved: unknown) => void
+                ),
+        async (_req: Request): Promise<Response> => ({} as Response)
+    );
+
+    return (argument, apply): void => {
+        void composed(argument, apply);
+    };
+}
+
+export async function getGenFromRegistry<Request, Response>(
+    stack: string[],
+    registry: GenMiddlewareRegistry
+): Promise<GenMiddlewareStack<Request, Response>> {
+    const haystack = Object.keys(registry);
+
+    const missing = stack.filter((el) => !haystack.includes(el));
+    if (missing.length > 0) {
+        throw new Error(`Missing middlewares in registry: ${missing.join(', ')}`);
+    }
+
+    // Extract middlewares from registry
+    const middlewares = stack.map((el) => registry[el]);
+    return (await Promise.all(middlewares)) as unknown as GenMiddlewareStack<Request, Response>;
 }

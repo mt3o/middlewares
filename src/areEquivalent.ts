@@ -1,4 +1,10 @@
-import {ZodObject, ZodSchema} from 'zod';
+import {type ZodSchema} from 'zod';
+
+interface SchemaWithDef {
+    _def?: {
+        typeName?: string;
+    };
+}
 
 /**
  * Check if A is superset of B. So: B contains all keys of A. Default implementation assumes that:
@@ -25,20 +31,35 @@ export function areTypesEquivalent<T, U>(
     }
 
     // Both are defined at this point
-    if (a instanceof ZodObject && b instanceof ZodObject) {
-        const shapeA = a.shape;
-        const shapeB = b.shape;
+    if (a && b && 'shape' in a && 'shape' in b) {
+        //we want to avoid using zod as runtime dependency
+        const shapeA = a.shape as Record<string,any>;
+        const shapeB = b.shape as Record<string,any>;
 
-        const keysA = Object.keys(shapeA);
-        const keysB = Object.keys(shapeB);
+        const keysA = Object.keys(shapeA!);
+        const keysB = Object.keys(shapeB!);
 
-        for (const key of keysA) {
-            if (!keysB.includes(key) || !areTypesEquivalent(shapeA[key], shapeB[key])) {
-                return false;
+        try {
+
+            for (const key of keysA) {
+                if (!keysB.includes(key) || !areTypesEquivalent(shapeA[key], shapeB[key])) {
+                    return false;
+                }
             }
-        }
 
-        return true;
+            return true;
+        }catch(e){
+            console.error('Type validation failed',e);
+            return false;
+        }
     }
-    return true;
+
+    // Compare type names for non-object schemas
+    try {
+        const aSchema = a as SchemaWithDef;
+        const bSchema = b as SchemaWithDef;
+        return bSchema._def?.typeName === aSchema._def?.typeName;
+    } catch {
+        return false;
+    }
 }
