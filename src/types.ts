@@ -38,7 +38,7 @@ export type Middleware<
 export type MiddlewareStackItem<Request=any,Response=any> = Middleware<Request, any, any, Response> | Middleware<Request, never, never, Response>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type MiddlewareStack<Request=any,Response=any> = [MiddlewareStackItem<Request, Response>, ...MiddlewareStackItem[]];
+export type MiddlewareStack<Request=any,Response=any> = [MiddlewareStackItem<Request, Response>]|[MiddlewareStackItem<Request, Response>, ...MiddlewareStackItem[]];
 
 export type ExecutableStack<Request, Response> = (initialRequest:Request) => Promise<Response>;
 
@@ -83,7 +83,7 @@ export type MiddlewareRegistry = Record<string, MiddlewareProvider>;
  * ```
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type MiddlewareProvider = () => Promise<Middleware<any,any,any,any>>;
+export type MiddlewareProvider = () => Promise<Middleware<any,any,any,any>|Middleware<any,never,never,any>>;
 
 
 
@@ -151,8 +151,7 @@ export type GenMiddleware<MyArgType, NextMiddlewareArg, NextMiddlewareReturnType
 
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type GenStackItem<Request = any, Response = any> =
-    GenMiddleware<Request, unknown, unknown, Response>
+export type GenStackItem<Request = any, Response = any> = GenMiddleware<Request, any, any, Response>
     | GenMiddleware<Request, never, never, Response>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -166,6 +165,8 @@ export type ExecutableGenStack<Request, Response> = (
     resolve: (resolved: Response) => void
 ) => void;
 
-export type GenMiddlewareRegistry = Record<string, GenMiddlewareProvider>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type GenMiddlewareRegistry = Record<string, GenMiddlewareProvider<any,any>>;
 
-export type GenMiddlewareProvider = () => Promise<GenMiddleware<unknown, unknown, unknown, unknown>>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type GenMiddlewareProvider<Input,Output> = () => Promise<GenMiddleware<Input, any, any, Output>|GenMiddleware<any, never, never, any>>;

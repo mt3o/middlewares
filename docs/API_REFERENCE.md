@@ -681,7 +681,7 @@ expect(result).toStrictEqual({
     success: true ,
 })
 
-expect(async ()=>{
+await expect(async ()=>{
     await executable({
         name: '',
     });

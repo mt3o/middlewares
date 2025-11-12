@@ -7,10 +7,10 @@ import {
   getGenFromRegistry,
 } from '../src/registry';
 import type {
-  Middleware,
-  MiddlewareRegistry,
-  GenMiddleware,
-  GenMiddlewareRegistry,
+    Middleware,
+    MiddlewareRegistry,
+    GenMiddleware,
+    GenMiddlewareRegistry, MiddlewareStack, GenMiddlewareStack,
 } from '../src';
 
 // ============================================
@@ -179,7 +179,7 @@ describe('composeStack', () => {
     middleware.MyArgType = RequestSchema;
     middleware.MyReturnType = ResponseSchema;
 
-    const stack = [middleware];
+    const stack: MiddlewareStack<Request, Response> = [middleware];
     const executable = composeStack(stack);
 
     const result = await executable({ value: 5 });
@@ -208,7 +208,7 @@ describe('composeStack', () => {
     middleware2.MyArgType = RequestSchema;
     middleware2.MyReturnType = ResponseSchema;
 
-    const stack = [middleware1, middleware2];
+    const stack: MiddlewareStack<Request, Response> = [middleware1, middleware2];
     const executable = composeStack(stack);
 
     await executable({ value: 5 });
@@ -232,7 +232,7 @@ describe('composeStack', () => {
     middleware2.MyArgType = MiddleSchema;
     middleware2.MyReturnType = ResponseSchema;
 
-    const stack = [middleware1, middleware2];
+    const stack: MiddlewareStack<Request, Response> = [middleware1, middleware2];
     const executable = composeStack(stack);
 
     const result = await executable({ value: 5 });
@@ -261,7 +261,7 @@ describe('composeStack', () => {
     middleware2.MyArgType = RequestSchema;
     middleware2.MyReturnType = ResponseSchema;
 
-    const stack = [middleware1, middleware2];
+    const stack: MiddlewareStack<Request, Response> = [middleware1, middleware2];
     const executable = composeStack(stack);
 
     await executable({ value: 5 });
@@ -273,7 +273,7 @@ describe('composeStack', () => {
     const middleware1: Middleware<Request, Request, Response, Response> = async (input, next) => {
       try {
         return await next(input);
-      } catch (error) {
+      } catch (_error) {
         return { result: -1 };
       }
     };
@@ -291,7 +291,7 @@ describe('composeStack', () => {
     middleware2.MyArgType = RequestSchema;
     middleware2.MyReturnType = ResponseSchema;
 
-    const stack = [middleware1, middleware2];
+    const stack: MiddlewareStack<Request, Response> = [middleware1, middleware2];
     const executable = composeStack(stack);
 
     const result = await executable({ value: -5 });
@@ -306,7 +306,7 @@ describe('composeStack', () => {
     middleware.MyArgType = RequestSchema;
     middleware.MyReturnType = ResponseSchema;
 
-    const stack = [middleware];
+    const stack: MiddlewareStack<Request, Response> = [middleware];
     const executable = composeStack(stack);
 
     expect(typeof executable).toBe('function');
@@ -338,7 +338,7 @@ describe('composeStack', () => {
     middleware3.MyArgType = MiddleSchema;
     middleware3.MyReturnType = ResponseSchema;
 
-    const stack = [middleware1, middleware2, middleware3];
+    const stack: MiddlewareStack<Request, Response> = [middleware1, middleware2, middleware3];
     const executable = composeStack(stack);
 
     const result = await executable({ value: 10 });
@@ -363,7 +363,7 @@ describe('composeGenStack', () => {
     middleware.MyArgType = RequestSchema;
     middleware.MyReturnType = ResponseSchema;
 
-    const stack = [middleware];
+    const stack: GenMiddlewareStack<Request, Response> = [middleware];
     const executable = composeGenStack(stack);
 
     const result = await new Promise<Response>((resolve) => {
@@ -403,7 +403,7 @@ describe('composeGenStack', () => {
     middleware2.MyArgType = RequestSchema;
     middleware2.MyReturnType = ResponseSchema;
 
-    const stack = [middleware1, middleware2];
+    const stack: GenMiddlewareStack<Request, Response> = [middleware1, middleware2];
     const executable = composeGenStack(stack);
 
     await new Promise<void>((resolve) => {
@@ -441,7 +441,7 @@ describe('composeGenStack', () => {
     middleware2.MyArgType = MiddleSchema;
     middleware2.MyReturnType = ResponseSchema;
 
-    const stack = [middleware1, middleware2];
+    const stack: GenMiddlewareStack<Request, Response> = [middleware1, middleware2];
     const executable = composeGenStack(stack);
 
     const result = await new Promise<Response>((resolve) => {
@@ -462,7 +462,7 @@ describe('composeGenStack', () => {
     middleware.MyArgType = RequestSchema;
     middleware.MyReturnType = ResponseSchema;
 
-    const stack = [middleware];
+    const stack: GenMiddlewareStack<Request, Response> = [middleware];
     const executable = composeGenStack(stack);
 
     expect(typeof executable).toBe('function');
