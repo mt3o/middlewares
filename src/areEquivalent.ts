@@ -2,7 +2,8 @@ import {type ZodSchema} from 'zod';
 
 interface SchemaWithDef {
     _def?: {
-        typeName?: string;
+        typeName?: string; //zod3
+        type?: string; //zod4
     };
 }
 
@@ -60,7 +61,17 @@ export function areTypesEquivalent<T, U>(
     try {
         const aSchema = a as SchemaWithDef;
         const bSchema = b as SchemaWithDef;
-        return bSchema._def?.typeName === aSchema._def?.typeName;
+        //zod3
+        if('typeName' in aSchema._def! && 'typeName' in bSchema._def!){
+            return bSchema._def?.typeName === aSchema._def?.typeName;
+        }
+
+        //zod4
+        if('type' in aSchema._def! && 'type' in bSchema._def!){
+            return bSchema._def?.type === aSchema._def?.type;
+        }
+        //failed to determine type with zod?!
+        return false;
     } catch {
         return false;
     }

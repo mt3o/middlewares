@@ -8,5 +8,15 @@ export default defineConfig({
       './**/*.md',
       './test/**/*.[jt]s?(x)',
     ],
+      exclude: [
+          "dist/**",
+          "node_modules/**",
+          "**/*.test-d.ts"
+      ],
+      coverage:{
+        exclude:[
+            "dist/**",
+        ]
+      }
   },
 });
