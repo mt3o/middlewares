@@ -14,8 +14,6 @@
   },
   "license": "MIT",
   "private": true,
-  "dependencies": {
-  },
   "author": {
     "name": "Teodor Kulej",
     "email": "mt3o@users.noreply.github.com",
@@ -33,7 +31,9 @@
     "clean": "rimraf coverage build out tmp"
   },
   "devDependencies": {
+    "eslint": "^9.39.1",
     "typescript": "~5.8.3",
+    "typescript-eslint": "^8.46.4",
     "vite": "^7.2.1",
     "vite-plugin-doctest": "^1.1.1",
     "vitest": "^3.2.4",

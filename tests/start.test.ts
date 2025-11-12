@@ -47,6 +47,7 @@ describe('areTypesEquivalent', () => {
 });
 
 //in real code use real types, not any/never
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Foo: Middleware<any, any, any, any> = async (_input, _next) => ({bar: 42});
 Foo.MyArgType = z.object({foo: z.string()});
 Foo.NextMiddlewareArg = z.object({question: z.string()});
@@ -55,6 +56,7 @@ Foo.MyReturnType = z.object({bar: z.number()});
 Foo.Name = "Foo";
 
 //in real code use real types, not any/never
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Bar: Middleware<any, any, any, any> = async (_input, _next) => ({baz: true});
 Bar.MyArgType = z.object({question: z.string()});
 Bar.NextMiddlewareArg = z.object({bar: z.number()});
@@ -63,6 +65,7 @@ Bar.MyReturnType = z.object({baz: z.boolean()});
 Bar.Name = "Middle";
 
 //in real code use real types, not any/never
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Baz: Middleware<any, never, never, any> = async (_input, _next) => ({baz: 42});
 Baz.MyArgType = z.object({bar: z.number()});
 Baz.MyReturnType = z.object({baz: z.number()});

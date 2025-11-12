@@ -34,14 +34,55 @@ export type Middleware<
     MyReturnType
 > & MiddlewareValidation<MyArgType, NextMiddlewareArg, NextMiddlewareReturnType, MyReturnType>;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type MiddlewareStackItem<Request=any,Response=any> = Middleware<Request, any, any, Response> | Middleware<Request, never, never, Response>;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type MiddlewareStack<Request=any,Response=any> = [MiddlewareStackItem<Request, Response>, ...MiddlewareStackItem[]];
 
 export type ExecutableStack<Request, Response> = (initialRequest:Request) => Promise<Response>;
 
+/**
+ * A registry mapping middleware names to their corresponding provider functions.
+ * Can be used to dynamically load middleware by name.
+ * @example
+ * ```ts
+ * import {ExecuteMiddleware} from './middlewares/executeMiddleware';
+ *
+ * const middlewareRegistry: MiddlewareRegistry = {
+ *     logger: async () => { //dynamic import
+ *         const { loggerMiddleware } = await import('./middlewares/loggerMiddleware');
+ *         return loggerMiddleware;
+ *     },
+ *     auth: async () => { //dynamic import
+ *         const { authMiddleware } = await import('./middlewares/authMiddleware');
+ *         return authMiddleware;
+ *     },
+ *     execute: ()=>{ //explicit static import
+ *         return ExecuteMiddleware;
+ *     }
+ * };
+ *
+ * const stack = composeStack(
+ *   getFromRegistry(['logger', 'auth'], middlewareRegistry)
+ * );
+ *  ```
+ */
 export type MiddlewareRegistry = Record<string, MiddlewareProvider>;
 
+/**
+ * A provider function that returns a Promise resolving to a Middleware instance.
+ * Can be used for lazy loading or dynamic importing of middleware.
+ *
+ * @example
+ * ```ts
+ * const loggerMiddlewareProvider: MiddlewareProvider = async () => {
+ *     const { loggerMiddleware } = await import('./middlewares/loggerMiddleware');
+ *     return loggerMiddleware;
+ * };
+ * ```
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type MiddlewareProvider = () => Promise<Middleware<any,any,any,any>>;
 
 
@@ -109,11 +150,12 @@ export type GenMiddleware<MyArgType, NextMiddlewareArg, NextMiddlewareReturnType
 ;
 
 
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type GenStackItem<Request = any, Response = any> =
-    GenMiddleware<Request, any, any, Response>
+    GenMiddleware<Request, unknown, unknown, Response>
     | GenMiddleware<Request, never, never, Response>;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type GenMiddlewareStack<Request = any, Response = any> = [
     GenStackItem<Request, Response>,
     ...GenStackItem[]

@@ -15,6 +15,8 @@ interface SchemaWithDef {
  * A undefined, B defined => false
  * A defined, B undefined => true
  * but you can provide your own validator if you dont want to rely on Zod but have your own type validation library
+ *
+ * Depends on Zod `shape` property for object schemas and `_def.typeName` for primitive schemas.
  */
 export function areTypesEquivalent<T, U>(
     a: ZodSchema<T> | undefined,
@@ -33,8 +35,8 @@ export function areTypesEquivalent<T, U>(
     // Both are defined at this point
     if (a && b && 'shape' in a && 'shape' in b) {
         //we want to avoid using zod as runtime dependency
-        const shapeA = a.shape as Record<string,any>;
-        const shapeB = b.shape as Record<string,any>;
+        const shapeA = a.shape as Record<string,never>;
+        const shapeB = b.shape as Record<string,never>;
 
         const keysA = Object.keys(shapeA!);
         const keysB = Object.keys(shapeB!);
