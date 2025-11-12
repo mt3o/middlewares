@@ -12,7 +12,7 @@ This documentation suite provides everything you need to understand, implement, 
 |----------|---------|----------|
 | **[README.md](./README.md)** | Overview and quick start | Getting started, feature overview |
 | **[ARCHITECTURE.md](./ARCHITECTURE.md)** | Middleware concepts and patterns | Understanding middleware design |
-| **[CLEAN_ARCHITECTURE.md](./CLEAN_ARCHITECTURE.md)** | Clean Architecture integration | Building maintainable applications |
+| **[CLEAN_ARCHITECTURE.md](CLEAN_ARCHITECTURE_ai_draft.md)** | Clean Architecture integration | Building maintainable applications |
 | **[COMPARISONS.md](./COMPARISONS.md)** | Framework comparisons | Understanding Middleware-Pipe's advantages |
 | **[CODE_EXAMPLES.md](./CODE_EXAMPLES.md)** | Practical code examples | Learning by example |
 | **[DIAGRAMS.md](./DIAGRAMS.md)** | Visual representations | Understanding execution flow |
@@ -47,7 +47,7 @@ If you're familiar with Express.js middleware:
 
 If you're designing scalable applications:
 
-1. **[CLEAN_ARCHITECTURE.md](./CLEAN_ARCHITECTURE.md)** - Understand architectural alignment
+1. **[CLEAN_ARCHITECTURE.md](CLEAN_ARCHITECTURE_ai_draft.md)** - Understand architectural alignment
 2. **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Learn layering patterns
 3. **[CODE_EXAMPLES.md](./CODE_EXAMPLES.md)** - See enterprise patterns
 4. **[DIAGRAMS.md](./DIAGRAMS.md)** - Visualize the architecture
