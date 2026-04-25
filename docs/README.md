@@ -113,7 +113,11 @@ Request
   ↓
 [Middleware 2] → transforms request
   ↓
-[Middleware 3] → transforms request
+[Middleware 3] → transforms request, produces response
+  ↓
+[Middleware 2] → transforms response
+  ↓
+[Middleware 1] → transforms response
   ↓
 Response
 ```
