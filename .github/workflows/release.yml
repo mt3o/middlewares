@@ -10,16 +10,23 @@ permissions:
   id-token: write # required for npm provenance
 
 jobs:
-  publish:
+  stage:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22.x
+          # Staged publishing requires Node >= 22.14.0.
+          node-version: 22.14.0
           registry-url: https://registry.npmjs.org
           cache: npm
+
+      # Node 22 ships npm 10.x; staged publishing needs npm CLI >= 11.15.0.
+      - name: Upgrade npm
+        run: |
+          npm install -g npm@latest
+          npm --version
 
       - run: npm ci
 
@@ -32,8 +39,23 @@ jobs:
             exit 1
           fi
 
-      # prepublishOnly runs clean + lint + test + build.
-      - name: Publish
-        run: npm publish --provenance --access public
+      # `npm stage publish` uploads the tarball to the stage queue instead of
+      # the live registry. It carries no 2FA requirement, which is what makes it
+      # usable from CI; the 2FA gate moves to the approval step below.
+      # prepublishOnly runs clean + lint + test + build first.
+      - name: Stage the release
+        run: npm stage publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Show what is waiting for approval
+        run: npm stage list @mt3o/middleware-pipe
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Next step
+        run: |
+          echo "::notice::Staged, not published. Approve it to go live:"
+          echo "::notice::  npm stage list @mt3o/middleware-pipe"
+          echo "::notice::  npm stage approve <stage-id>      # prompts for 2FA"
+          echo "::notice::Or use the Staged Packages tab on npmjs.com."
