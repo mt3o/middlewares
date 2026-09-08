@@ -214,6 +214,7 @@ validateStack(stack, (a, b) => myLibrary.isCompatible(a, b));
 ## Documentation
 
 - [Architecture](./docs/ARCHITECTURE.md) — middleware concepts, stacking patterns, layering
+- [Clean Architecture](./docs/CLEAN_ARCHITECTURE.md) — the Dependency Rule, ports, and the composition root
 - [API reference](./docs/API_REFERENCE.md) — every export in detail
 - [Code examples](./docs/CODE_EXAMPLES.md) — worked examples and patterns
 - [Diagrams](./docs/DIAGRAMS.md) — visual walkthroughs of the execution flow

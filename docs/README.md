@@ -58,6 +58,7 @@ console.log(result); // { result: 'HELLO' }
 ## 📚 Documentation Structure
 
 - **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Deep dive into middleware concepts, stacking patterns, and layered architecture
+- **[CLEAN_ARCHITECTURE.md](./CLEAN_ARCHITECTURE.md)** - How Middleware-Pipe supports Clean Architecture principles
 - **[COMPARISONS.md](./COMPARISONS.md)** - Parallels with Express.js, Apache Tomcat, and other frameworks
 - **[CODE_EXAMPLES.md](./CODE_EXAMPLES.md)** - Comprehensive code examples and patterns
 - **[DIAGRAMS.md](./DIAGRAMS.md)** - Visual representations of middleware flow and architecture

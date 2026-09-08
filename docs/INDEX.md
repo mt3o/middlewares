@@ -12,6 +12,7 @@ This documentation suite provides everything you need to understand, implement, 
 |----------|---------|----------|
 | **[README.md](./README.md)** | Overview and quick start | Getting started, feature overview |
 | **[ARCHITECTURE.md](./ARCHITECTURE.md)** | Middleware concepts and patterns | Understanding middleware design |
+| **[CLEAN_ARCHITECTURE.md](./CLEAN_ARCHITECTURE.md)** | Clean Architecture integration | Building maintainable applications |
 | **[COMPARISONS.md](./COMPARISONS.md)** | Framework comparisons | Understanding Middleware-Pipe's advantages |
 | **[CODE_EXAMPLES.md](./CODE_EXAMPLES.md)** | Practical code examples | Learning by example |
 | **[DIAGRAMS.md](./DIAGRAMS.md)** | Visual representations | Understanding execution flow |
@@ -46,9 +47,10 @@ If you're familiar with Express.js middleware:
 
 If you're designing scalable applications:
 
-1. **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Learn layering patterns and architectural alignment
-2. **[CODE_EXAMPLES.md](./CODE_EXAMPLES.md)** - See enterprise patterns
-3. **[DIAGRAMS.md](./DIAGRAMS.md)** - Visualize the architecture
+1. **[CLEAN_ARCHITECTURE.md](./CLEAN_ARCHITECTURE.md)** - Understand architectural alignment
+2. **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Learn layering patterns
+3. **[CODE_EXAMPLES.md](./CODE_EXAMPLES.md)** - See enterprise patterns
+4. **[DIAGRAMS.md](./DIAGRAMS.md)** - Visualize the architecture
 
 **Estimated Time:** 1.5-2 hours
 
@@ -87,6 +89,18 @@ If you just need to look something up:
 - Advanced patterns (factories, composition, conditional, caching)
 
 **Key Takeaway:** Middleware enables separation of concerns through layered, composable components.
+
+### CLEAN_ARCHITECTURE.md
+**Clean Architecture Integration**
+
+- Clean Architecture overview and the four rings
+- The Dependency Rule
+- Where a middleware stack fits, and where the analogy breaks
+- How the library enforces the rule (injected `next`, types as ports, composition root)
+- Worked example, boundary drift detection, swappable adapters
+- Benefits, limitations and caveats
+
+**Key Takeaway:** Middleware-Pipe turns the Dependency Rule from a team convention into a property of how the code is wired.
 
 ### COMPARISONS.md
 **Framework Comparisons**
