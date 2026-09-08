@@ -12,7 +12,6 @@ This documentation suite provides everything you need to understand, implement, 
 |----------|---------|----------|
 | **[README.md](./README.md)** | Overview and quick start | Getting started, feature overview |
 | **[ARCHITECTURE.md](./ARCHITECTURE.md)** | Middleware concepts and patterns | Understanding middleware design |
-| **[CLEAN_ARCHITECTURE.md](CLEAN_ARCHITECTURE_ai_draft.md)** | Clean Architecture integration | Building maintainable applications |
 | **[COMPARISONS.md](./COMPARISONS.md)** | Framework comparisons | Understanding Middleware-Pipe's advantages |
 | **[CODE_EXAMPLES.md](./CODE_EXAMPLES.md)** | Practical code examples | Learning by example |
 | **[DIAGRAMS.md](./DIAGRAMS.md)** | Visual representations | Understanding execution flow |
@@ -47,10 +46,9 @@ If you're familiar with Express.js middleware:
 
 If you're designing scalable applications:
 
-1. **[CLEAN_ARCHITECTURE.md](CLEAN_ARCHITECTURE_ai_draft.md)** - Understand architectural alignment
-2. **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Learn layering patterns
-3. **[CODE_EXAMPLES.md](./CODE_EXAMPLES.md)** - See enterprise patterns
-4. **[DIAGRAMS.md](./DIAGRAMS.md)** - Visualize the architecture
+1. **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Learn layering patterns and architectural alignment
+2. **[CODE_EXAMPLES.md](./CODE_EXAMPLES.md)** - See enterprise patterns
+3. **[DIAGRAMS.md](./DIAGRAMS.md)** - Visualize the architecture
 
 **Estimated Time:** 1.5-2 hours
 
@@ -89,18 +87,6 @@ If you just need to look something up:
 - Advanced patterns (factories, composition, conditional, caching)
 
 **Key Takeaway:** Middleware enables separation of concerns through layered, composable components.
-
-### CLEAN_ARCHITECTURE.md
-**Clean Architecture Integration**
-
-- Clean Architecture overview
-- Layers in Clean Architecture
-- How Middleware-Pipe supports Clean Architecture
-- Dependency rule enforcement
-- Practical implementation examples
-- Benefits of the approach
-
-**Key Takeaway:** Middleware-Pipe naturally aligns with Clean Architecture principles for building maintainable applications.
 
 ### COMPARISONS.md
 **Framework Comparisons**
@@ -295,8 +281,8 @@ if (errors.length > 0) {
 ## 🔗 Related Resources
 
 ### Official Resources
-- [GitHub Repository](https://github.com/mt3o/middleware-pipe)
-- [NPM Package](https://npmjs.com/package/middleware-pipe)
+- [GitHub Repository](https://github.com/mt3o/middlewares)
+- [NPM Package](https://npmjs.com/package/@mt3o/middleware-pipe)
 
 ### External Resources
 - [Clean Architecture by Robert C. Martin](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
@@ -358,7 +344,7 @@ For questions, issues, or contributions:
 
 1. Check the [FAQ](#faq) section above
 2. Review [CODE_EXAMPLES.md](./CODE_EXAMPLES.md) for similar patterns
-3. Check the [GitHub Issues](https://github.com/mt3o/middleware-pipe/issues)
+3. Check the [GitHub Issues](https://github.com/mt3o/middlewares/issues)
 4. Create a new issue with details
 
 ## 📄 License
@@ -377,4 +363,4 @@ Middleware-Pipe is licensed under the MIT License. See the LICENSE file for deta
 
 **Documentation Version:** 1.0.0
 
-For the latest documentation, visit the [GitHub repository](https://github.com/mt3o/middleware-pipe).
+For the latest documentation, visit the [GitHub repository](https://github.com/mt3o/middlewares).

@@ -9,7 +9,7 @@
 5. [Django](#django)
 6. [Key takeways](#key-takeways)
 
-The middleware pattern is widely used in various web frameworks for handling requests and responses. Below, we compare Middleware-Pipe with several popular frameworks, highlighting similarities and differences so that learning middleware-pipe will be easier.
+The middleware pattern is widely used in various web frameworks for handling requests and responses. Below, we compare Middleware-Pipe with several popular frameworks, highlighting similarities and differences so that learning Middleware-Pipe will be easier.
 
 ## Express.js
 

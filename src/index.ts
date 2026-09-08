@@ -1,6 +1,6 @@
-import {areTypesEquivalent} from './areEquivalent';
-import {composeStack, getFromRegistry, getGenFromRegistry} from './registry';
-import {validateStack} from './validate';
+import {areTypesEquivalent} from './areEquivalent.js';
+import {composeGenStack, composeStack, getFromRegistry, getGenFromRegistry} from './registry.js';
+import {validateStack} from './validate.js';
 import type {
     Middleware,
     MiddlewareStack,
@@ -16,12 +16,13 @@ import type {
     GenStackItem,
     GenMiddlewareProvider,
     GenMiddlewareRegistry,
-} from './types';
+} from './types.js';
 
 
 export {
     areTypesEquivalent,
     composeStack,
+    composeGenStack,
     getFromRegistry,
     getGenFromRegistry,
     validateStack,

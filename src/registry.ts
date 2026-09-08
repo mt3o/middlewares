@@ -2,7 +2,7 @@ import type {
     ExecutableGenStack,
     ExecutableStack,
     GenMiddlewareRegistry, GenMiddlewareStack, MiddlewareCall, MiddlewareRegistry, MiddlewareStack, NextGen
-} from "./types";
+} from "./types.js";
 
 
 
@@ -35,8 +35,8 @@ export async function getFromRegistry<Request, Response>(
         throw new Error(`Missing middlewares in registry: ${missing.join(', ')}`);
     }
 
-    // Extract middlewares from registry
-    const middlewares = stack.map((el) => registry[el]);
+    // Invoke each provider so the stack holds middlewares, not the providers themselves
+    const middlewares = stack.map((el) => registry[el]());
     return (await Promise.all(middlewares)) as unknown as MiddlewareStack<Request, Response>;
 }
 
@@ -75,7 +75,9 @@ export function composeGenStack<Request, Response>(
                     next as LocalNext,
                     resolve as (resolved: unknown) => void
                 ),
-        async (_req: Request): Promise<Response> => ({} as Response)
+        // Terminal link: a middleware that calls next() past the end of the stack
+        // must still see its callback fire, otherwise the chain silently hangs.
+        (_details: Request, resolve: (arg: Response) => void) => resolve({} as Response)
     );
 
     return (argument, apply): void => {
@@ -94,7 +96,7 @@ export async function getGenFromRegistry<Request, Response>(
         throw new Error(`Missing middlewares in registry: ${missing.join(', ')}`);
     }
 
-    // Extract middlewares from registry
-    const middlewares = stack.map((el) => registry[el]);
+    // Invoke each provider so the stack holds middlewares, not the providers themselves
+    const middlewares = stack.map((el) => registry[el]());
     return (await Promise.all(middlewares)) as unknown as GenMiddlewareStack<Request, Response>;
 }

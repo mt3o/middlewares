@@ -1,5 +1,5 @@
-import type {GenMiddlewareStack, MiddlewareStack} from "./types";
-import {areTypesEquivalent} from "./index";
+import type {GenMiddlewareStack, MiddlewareStack} from "./types.js";
+import {areTypesEquivalent} from "./areEquivalent.js";
 
 function isNever(value: unknown): boolean {
     return value === undefined || value === null;
@@ -27,7 +27,7 @@ export function validateStack<In, Out>(
             );
         }
 
-        if (!areEquivalent(self.NextMiddlewareReturnType, next.MyReturnType)) {
+        if (!isNever(self.NextMiddlewareReturnType) && !areEquivalent(self.NextMiddlewareReturnType, next.MyReturnType)) {
             errors.push(
                 new Error(
                     `Types don't match between self:${self.Name}.NextMiddlewareReturnType and next:${next.Name}.MyReturnType output type`

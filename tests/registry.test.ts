@@ -621,10 +621,12 @@ describe('Registry Integration', () => {
       'identity': async () => middleware2,
     };
 
-    const stack = await getFromRegistry(['double', 'identity'], registry);
+    const stack = await getFromRegistry<Request, Response>(['double', 'identity'], registry);
     expect(stack).toHaveLength(2);
     const executable = composeStack(stack);
-    expect(typeof executable).toBe('function');
+
+    const result = await executable({ value: 21 });
+    expect(result).toEqual({ result: 42 });
   });
 
   it('should work with getGenFromRegistry and composeGenStack together', async () => {
@@ -657,9 +659,79 @@ describe('Registry Integration', () => {
       'identity': async () => middleware2,
     };
 
-    const stack = await getGenFromRegistry(['double', 'identity'], registry);
+    const stack = await getGenFromRegistry<Request, Response>(['double', 'identity'], registry);
     expect(stack).toHaveLength(2);
     const executable = composeGenStack(stack);
-    expect(typeof executable).toBe('function');
+
+    const result = await new Promise<Response>((done) => executable({ value: 21 }, done));
+    expect(result).toEqual({ result: 42 });
+  });
+
+  // Regression guard: getFromRegistry used to return the provider functions
+  // themselves instead of awaiting them, which made every registry-composed
+  // stack resolve to a middleware function rather than a response.
+  it('should resolve providers to the middlewares they return, not the providers', async () => {
+    const middleware: Middleware<Request, never, never, Response> = async (input) => ({
+      result: input.value * 2,
+    });
+    middleware.MyArgType = RequestSchema;
+    middleware.MyReturnType = ResponseSchema;
+
+    let providerCalls = 0;
+    const registry: MiddlewareRegistry = {
+      'double': async () => {
+        providerCalls++;
+        return middleware;
+      },
+    };
+
+    const stack = await getFromRegistry<Request, Response>(['double'], registry);
+
+    expect(providerCalls).toBe(1);
+    expect(stack[0]).toBe(middleware);
+    await expect(composeStack(stack)({ value: 5 })).resolves.toEqual({ result: 10 });
+  });
+
+  it('should resolve gen providers to the middlewares they return, not the providers', async () => {
+    const middleware: GenMiddleware<Request, never, never, Response> = async (
+      input,
+      _next,
+      resolve
+    ) => {
+      resolve({ result: input.value * 2 });
+    };
+    middleware.MyArgType = RequestSchema;
+    middleware.MyReturnType = ResponseSchema;
+
+    let providerCalls = 0;
+    const registry: GenMiddlewareRegistry = {
+      'double': async () => {
+        providerCalls++;
+        return middleware;
+      },
+    };
+
+    const stack = await getGenFromRegistry<Request, Response>(['double'], registry);
+
+    expect(providerCalls).toBe(1);
+    expect(stack[0]).toBe(middleware);
+
+    const result = await new Promise<Response>((done) => composeGenStack(stack)({ value: 5 }, done));
+    expect(result).toEqual({ result: 10 });
+  });
+
+  it('should not invoke providers for middlewares missing from the registry', async () => {
+    let providerCalls = 0;
+    const registry: MiddlewareRegistry = {
+      'present': async () => {
+        providerCalls++;
+        return (async () => ({ result: 0 })) as Middleware<Request, never, never, Response>;
+      },
+    };
+
+    await expect(getFromRegistry(['present', 'absent'], registry)).rejects.toThrow(
+      'Missing middlewares in registry: absent'
+    );
+    expect(providerCalls).toBe(0);
   });
 });

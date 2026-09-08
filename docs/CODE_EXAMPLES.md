@@ -17,7 +17,7 @@ Transform a string to uppercase:
 ```typescript UppercaseMiddleware:@import.meta.vitest
 const { expect } = await import('vitest');
 
-const { Middleware, composeStack } = await import('middleware-pipe');
+const { Middleware, composeStack } = await import('@mt3o/middleware-pipe');
 const { z } = await import('zod');
 
 // Define types
@@ -51,7 +51,7 @@ Chain two transformations:
 ```typescript TwoMiddlewaersStack:@import.meta.vitest
 const { expect } = await import('vitest');
 
-const { Middleware, composeStack } = await import('middleware-pipe');
+const { Middleware, composeStack } = await import('@mt3o/middleware-pipe');
 const { z } = await import ('zod');
 
 // Types
@@ -99,7 +99,7 @@ Logging middleware:
 ```typescript TwoMiddlewaersStack:@import.meta.vitest
 const { expect } = await import('vitest');
 
-const { Middleware, composeStack } = await import('middleware-pipe');
+const { Middleware, composeStack } = await import('@mt3o/middleware-pipe');
 const { z } = await import ('zod');
 
 const DataSchema = z.object({ value: z.number() });
@@ -152,7 +152,7 @@ Process an API request through multiple layers:
 ```typescript RealExample:@import.meta.vitest
 const { expect } = await import('vitest');
 
-const { Middleware, composeStack, validateStack } = await import('middleware-pipe');
+const { Middleware, composeStack, validateStack } = await import('@mt3o/middleware-pipe');
 const { z } = await import ('zod');
 
 
@@ -280,7 +280,7 @@ Transform data through multiple stages:
 ```typescript RealExample2:@import.meta.vitest
 const { expect } = await import('vitest');
 
-const { Middleware, composeStack } = await import('middleware-pipe');
+const { Middleware, composeStack } = await import('@mt3o/middleware-pipe');
 const { z } = await import ('zod');
 
 
@@ -379,7 +379,7 @@ expect(result).toStrictEqual({
 Create reusable middleware with configuration:
 
 ```typescript
-import { Middleware } from 'middleware-pipe';
+import { Middleware } from '@mt3o/middleware-pipe';
 import { z } from 'zod';
 
 // Factory function
@@ -406,7 +406,7 @@ registry['ValidateUserMiddleware'] = createValidationMiddleware(UserSchema);
 Apply middleware conditionally:
 
 ```typescript
-import { Middleware, composeStack } from 'middleware-pipe';
+import { Middleware, composeStack } from '@mt3o/middleware-pipe';
 import { z } from 'zod';
 
 const DataSchema = z.object({ value: z.number() });
@@ -446,7 +446,7 @@ if(Math.random()>0.5){
 Cache results to avoid reprocessing:
 
 ```typescript
-import { Middleware } from 'middleware-pipe';
+import { Middleware } from '@mt3o/middleware-pipe';
 import { z } from 'zod';
 
 const RequestSchema = z.object({ id: z.string() });
@@ -486,7 +486,7 @@ CachingMiddleware.MyReturnType = ResponseSchema;
 ```typescript TryCatch Error Handling:@import.meta.vitest
 const { expect } = await import('vitest');
 
-const { Middleware, composeStack, validateStack } = await import('middleware-pipe');
+const { Middleware, composeStack, validateStack } = await import('@mt3o/middleware-pipe');
 const { z } = await import ('zod');
 
 const InputSchema = z.object({ value: z.number() });
@@ -523,7 +523,7 @@ expect(await executable({ value: 0 })).toStrictEqual({error: 'Cannot process zer
 ### Pattern 2: Error Transformation Middleware
 
 ```typescript
-import { Middleware } from 'middleware-pipe';
+import { Middleware } from '@mt3o/middleware-pipe';
 import { z } from 'zod';
 
 const DataSchema = z.object({ value: z.number() });
@@ -573,7 +573,7 @@ ErrorHandlingMiddleware.MyReturnType = z.union([SuccessResponseSchema, ErrorResp
 // and we use async imports to be compatible with Vitest ESM environment in doctests
 const { expect, describe, it, vi } = await import('vitest');
 
-const { Middleware, composeStack, validateStack } = await import('middleware-pipe');
+const { Middleware, composeStack, validateStack } = await import('@mt3o/middleware-pipe');
 const { z } = await import ('zod');
 
 

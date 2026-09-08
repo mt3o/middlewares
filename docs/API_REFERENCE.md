@@ -76,7 +76,7 @@ interface MiddlewareValidation<MyArgType, NextMiddlewareArg, NextMiddlewareRetur
 **Example:**
 
 ```typescript
-import { Middleware } from 'middleware-pipe';
+import { Middleware } from '@mt3o/middleware-pipe';
 import { z } from 'zod';
 
 const InputSchema = z.object({ email: z.string().email() });
@@ -165,7 +165,7 @@ const result = await executable({ text: 'hello' });
 Composes a middleware stack into an executable function.
 
 ```typescript
-import {composeStack} from 'middleware-pipe';
+import {composeStack} from '@mt3o/middleware-pipe';
 function composeStack<Request, Response>(
   stack: MiddlewareStack<Request, Response>
 ): ExecutableStack<Request, Response>
@@ -183,7 +183,7 @@ Uses `reduceRight` to compose middleware from right to left, creating a chain wh
 **Example:**
 
 ```typescript
-import { composeStack } from 'middleware-pipe';
+import { composeStack } from '@mt3o/middleware-pipe';
 
 const stack = [middleware1, middleware2, middleware3];
 const executable = composeStack(stack);
@@ -213,7 +213,7 @@ Checks that:
 **Example:**
 
 ```typescript
-import { validateStack } from 'middleware-pipe';
+import { validateStack } from '@mt3o/middleware-pipe';
 
 const errors = validateStack(stack);
 if (errors.length > 0) {
@@ -246,7 +246,7 @@ async function getFromRegistry<Request, Response>(
 **Example:**
 
 ```typescript
-import { getFromRegistry } from 'middleware-pipe';
+import { getFromRegistry } from '@mt3o/middleware-pipe';
 
 const registry: MiddlewareRegistry = {
   'validation': async () => ValidationMiddleware,
@@ -280,7 +280,7 @@ function areTypesEquivalent(type1: ZodSchema, type2: ZodSchema): boolean
 **Example:**
 
 ```typescript
-import { areTypesEquivalent } from 'middleware-pipe';
+import { areTypesEquivalent } from '@mt3o/middleware-pipe';
 import { z } from 'zod';
 
 const schema1 = z.object({ id: z.string() });
@@ -335,7 +335,7 @@ type GenMiddleware<
 **Example:**
 
 ```typescript
-import { GenMiddleware } from 'middleware-pipe';
+import { GenMiddleware } from '@mt3o/middleware-pipe';
 import { z } from 'zod';
 
 const RequestSchema = z.object({ value: z.number() });
@@ -439,7 +439,7 @@ function composeGenStack<Request, Response>(
 **Example:**
 
 ```typescript
-import { composeGenStack } from 'middleware-pipe';
+import { composeGenStack } from '@mt3o/middleware-pipe';
 
 const stack: GenMiddlewareStack = [
   middleware1,
@@ -475,7 +475,7 @@ async function getGenFromRegistry<Request, Response>(
 **Example:**
 
 ```typescript
-import { getGenFromRegistry } from 'middleware-pipe';
+import { getGenFromRegistry } from '@mt3o/middleware-pipe';
 
 const registry: GenMiddlewareRegistry = {
   'middleware1': async () => GenMiddleware1,
@@ -598,7 +598,7 @@ const {
   composeStack,
   validateStack,
   getFromRegistry,
-} = await import('middleware-pipe');
+} = await import('@mt3o/middleware-pipe');
 const { z } = await import('zod');
 
 const { expect } = await import('vitest');

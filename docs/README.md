@@ -24,13 +24,13 @@ A powerful TypeScript library for composing type-safe middleware stacks with aut
 ### Installation
 
 ```bash
-npm install middleware-pipe zod
+npm install @mt3o/middleware-pipe zod
 ```
 
 ### Basic Example
 
 ```typescript
-import { Middleware, composeStack } from 'middleware-pipe';
+import { Middleware, composeStack } from '@mt3o/middleware-pipe';
 import { z } from 'zod';
 
 // Define types
@@ -58,7 +58,6 @@ console.log(result); // { result: 'HELLO' }
 ## 📚 Documentation Structure
 
 - **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Deep dive into middleware concepts, stacking patterns, and layered architecture
-- **[CLEAN_ARCHITECTURE.md](CLEAN_ARCHITECTURE_ai_draft.md)** - How Middleware-Pipe supports Clean Architecture principles
 - **[COMPARISONS.md](./COMPARISONS.md)** - Parallels with Express.js, Apache Tomcat, and other frameworks
 - **[CODE_EXAMPLES.md](./CODE_EXAMPLES.md)** - Comprehensive code examples and patterns
 - **[DIAGRAMS.md](./DIAGRAMS.md)** - Visual representations of middleware flow and architecture
