@@ -187,7 +187,7 @@ const result = await executable(initialRequest);
 
 The returned promise resolves with whatever the outermost layer passes to `resolve`, and rejects
 with the first error thrown by any layer, even one reached through a `next()` nobody awaited.
-The 1.x callback still works: `executable(initialRequest, (result) => console.log(result))`.
+The 1.0 callback still works: `executable(initialRequest, (result) => console.log(result))`.
 
 `validateStack` accepts generator stacks too — the schema properties are identical.
 
@@ -205,9 +205,9 @@ const executable = composeStack(stack, { terminal: async (req) => ({ handled: fa
 const genExecutable = composeGenStack(genStack, { terminal: (details, resolve) => resolve({}) });
 ```
 
-## Migrating from 1.x
+## Upgrading from 1.0
 
-- **The end of the chain throws.** In 1.x, calling `next()` past the last middleware quietly
+- **The end of the chain throws.** In 1.0, calling `next()` past the last middleware quietly
   returned `{}`. It now rejects with `MiddlewareChainEndError`. To keep the old behavior, pass
   `{ terminal: async () => ({}) }` to `composeStack`, or
   `{ terminal: (_details, resolve) => resolve({}) }` to `composeGenStack`.

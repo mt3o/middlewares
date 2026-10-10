@@ -461,7 +461,7 @@ const executable: ExecutableGenStack<Request, Response> =
 
 const response = await executable(request);
 
-// The 1.x callback style still works:
+// The 1.0 callback style still works:
 executable(request, (response) => {
   console.log('Response:', response);
 });
