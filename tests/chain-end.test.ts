@@ -53,12 +53,12 @@ describe('composeGenStack: end of chain and errors', () => {
     };
     const execute: GenMiddleware<string, never, never, string> = async (_details, _next, _resolve) => {
       await Promise.resolve();
-      throw new Error('IMAP failed');
+      throw new Error('inner layer failed');
     };
 
     const executable = composeGenStack([outer, execute] as GenMiddlewareStack<string, string>);
 
-    await expect(executable('job')).rejects.toThrow('IMAP failed');
+    await expect(executable('job')).rejects.toThrow('inner layer failed');
   });
 
   it('resolves with the same value apply receives', async () => {
