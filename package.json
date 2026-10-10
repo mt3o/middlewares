@@ -1,6 +1,6 @@
 {
   "name": "@mt3o/middleware-pipe",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Type-safe middleware composition for TypeScript: onion-model stacks with optional Zod schema validation between layers and a lazy-loading registry.",
   "keywords": [
     "middleware",

@@ -160,10 +160,34 @@ export type GenMiddlewareStack<Request = any, Response = any> = [
     ...GenStackItem[]
 ];
 
+/**
+ * Runs a callback stack. The promise resolves with the value passed to the outermost `resolve`
+ * (the same value `resolve` here receives), and rejects with the first error thrown by any layer.
+ */
 export type ExecutableGenStack<Request, Response> = (
     initialRequest: Request,
-    resolve: (resolved: Response) => void
-) => void;
+    resolve?: (resolved: Response) => void
+) => Promise<Response>;
+
+/**
+ * Replaces the default end of a `composeStack` chain, which throws `MiddlewareChainEndError`.
+ * Receives whatever the last middleware passed to `next()`; its return value goes back to that middleware.
+ */
+export type ChainTerminal = (req: never) => unknown;
+
+/**
+ * Replaces the default end of a `composeGenStack` chain, which throws `MiddlewareChainEndError`.
+ * Receives whatever the last middleware passed to `next()` and that middleware's callback.
+ */
+export type GenChainTerminal = (details: never, resolve: (resolved: unknown) => void) => unknown;
+
+export type ComposeOptions = {
+    terminal?: ChainTerminal;
+};
+
+export type ComposeGenOptions = {
+    terminal?: GenChainTerminal;
+};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type GenMiddlewareRegistry = Record<string, GenMiddlewareProvider<any,any>>;
