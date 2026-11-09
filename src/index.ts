@@ -1,6 +1,7 @@
 import {areTypesEquivalent} from './areEquivalent.js';
 import {composeGenStack, composeStack, getFromRegistry, getGenFromRegistry} from './registry.js';
 import {validateStack} from './validate.js';
+import {MiddlewareChainEndError} from './errors.js';
 import type {
     Middleware,
     MiddlewareStack,
@@ -16,6 +17,10 @@ import type {
     GenStackItem,
     GenMiddlewareProvider,
     GenMiddlewareRegistry,
+    ChainTerminal,
+    GenChainTerminal,
+    ComposeOptions,
+    ComposeGenOptions,
 } from './types.js';
 
 
@@ -26,6 +31,7 @@ export {
     getFromRegistry,
     getGenFromRegistry,
     validateStack,
+    MiddlewareChainEndError,
     type Middleware,
     type MiddlewareStack,
     type MiddlewareCall,
@@ -40,4 +46,8 @@ export {
     type GenStackItem,
     type GenMiddlewareProvider,
     type GenMiddlewareRegistry,
+    type ChainTerminal,
+    type GenChainTerminal,
+    type ComposeOptions,
+    type ComposeGenOptions,
 }

@@ -167,12 +167,19 @@ Composes a middleware stack into an executable function.
 ```typescript
 import {composeStack} from '@mt3o/middleware-pipe';
 function composeStack<Request, Response>(
-  stack: MiddlewareStack<Request, Response>
+  stack: MiddlewareStack<Request, Response>,
+  options?: ComposeOptions
 ): ExecutableStack<Request, Response>
+
+type ComposeOptions = { terminal?: ChainTerminal };
+type ChainTerminal = (req: never) => unknown;
 ```
 
 **Parameters:**
 - `stack: MiddlewareStack<Request, Response>` - Array of middleware to compose
+- `options.terminal` - Optional. Called when the last middleware calls `next()`. It receives the
+  value passed to `next()`, and its (awaited) return value goes back to that middleware. Without
+  it, reaching the end rejects with [`MiddlewareChainEndError`](#middlewarechainenderror).
 
 **Returns:**
 - `ExecutableStack<Request, Response>` - Executable function
@@ -188,6 +195,36 @@ import { composeStack } from '@mt3o/middleware-pipe';
 const stack = [middleware1, middleware2, middleware3];
 const executable = composeStack(stack);
 const result = await executable(initialRequest);
+
+// Reaching the end of the chain is intended: answer it yourself.
+const lenient = composeStack(stack, { terminal: async () => ({}) });
+```
+
+### MiddlewareChainEndError
+
+Thrown (as a rejection) by `composeStack` and `composeGenStack` executables when the last
+middleware calls `next()`.
+
+```typescript
+class MiddlewareChainEndError extends Error {
+  readonly name: 'MiddlewareChainEndError';
+  readonly lastMiddleware: string | undefined; // `Name`, else the function name
+}
+```
+
+**Example:**
+
+```typescript
+import { MiddlewareChainEndError } from '@mt3o/middleware-pipe';
+
+try {
+  await executable(request);
+} catch (error) {
+  if (error instanceof MiddlewareChainEndError) {
+    console.error(`Stack ends at ${error.lastMiddleware}; is the handler missing?`);
+  }
+  throw error;
+}
 ```
 
 ### validateStack
@@ -402,12 +439,19 @@ Executable generator-based middleware stack.
 
 ```typescript
 type ExecutableGenStack<Request, Response> = 
-  (initialRequest: Request, resolve: (resolved: Response) => void) => void
+  (initialRequest: Request, resolve?: (resolved: Response) => void) => Promise<Response>
 ```
 
 **Parameters:**
 - `initialRequest: Request` - Initial request
-- `resolve: (resolved: Response) => void` - Callback for final response
+- `resolve?: (resolved: Response) => void` - Optional callback for the final response
+
+**Returns:**
+- `Promise<Response>` - Resolves with the value the outermost middleware passes to `resolve`
+  (the same value the callback receives). Rejects with the first error thrown by any layer,
+  including layers reached through a `next()` that was not awaited, and with
+  `MiddlewareChainEndError` when the end of the chain is reached. An error thrown by the
+  callback also rejects it.
 
 **Example:**
 
@@ -415,6 +459,9 @@ type ExecutableGenStack<Request, Response> =
 const executable: ExecutableGenStack<Request, Response> = 
   composeGenStack(stack);
 
+const response = await executable(request);
+
+// The 1.0 callback style still works:
 executable(request, (response) => {
   console.log('Response:', response);
 });
@@ -426,12 +473,19 @@ Composes a generator-based middleware stack.
 
 ```typescript
 function composeGenStack<Request, Response>(
-  callstack: GenMiddlewareStack<Request, Response>
+  callstack: GenMiddlewareStack<Request, Response>,
+  options?: ComposeGenOptions
 ): ExecutableGenStack<Request, Response>
+
+type ComposeGenOptions = { terminal?: GenChainTerminal };
+type GenChainTerminal = (details: never, resolve: (resolved: unknown) => void) => unknown;
 ```
 
 **Parameters:**
 - `callstack: GenMiddlewareStack<Request, Response>` - Array of generator middleware
+- `options.terminal` - Optional. Called when the last middleware calls `next()`, with the value
+  and callback it passed. Without it, reaching the end rejects the run with
+  [`MiddlewareChainEndError`](#middlewarechainenderror).
 
 **Returns:**
 - `ExecutableGenStack<Request, Response>` - Executable generator stack
@@ -449,9 +503,7 @@ const stack: GenMiddlewareStack = [
 
 const executable = composeGenStack(stack);
 
-executable(request, (response) => {
-  console.log('Final response:', response);
-});
+const response = await executable(request);
 ```
 
 ### getGenFromRegistry
@@ -695,7 +747,7 @@ await expect(async ()=>{
 The Middleware-Pipe API provides:
 
 1. **Core Types** - `Middleware`, `MiddlewareStack`, `ExecutableStack`
-2. **Composition Functions** - `composeStack`, `validateStack`
+2. **Composition Functions** - `composeStack`, `validateStack`, `MiddlewareChainEndError`
 3. **Registry System** - `getFromRegistry`, `MiddlewareRegistry`
 4. **Type Utilities** - `areTypesEquivalent`
 5. **Generator-Based Middleware** - `GenMiddleware`, `composeGenStack`

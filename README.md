@@ -182,21 +182,53 @@ const logger: GenMiddleware<Request, Downstream, DownstreamResponse, Response> =
 };
 
 const executable = composeGenStack([logger, backend]);
-executable(initialRequest, (result) => console.log(result));
+const result = await executable(initialRequest);
 ```
 
+The returned promise resolves with whatever the outermost layer passes to `resolve`, and rejects
+with the first error thrown by any layer, even one reached through a `next()` nobody awaited.
+The 1.0 callback still works: `executable(initialRequest, (result) => console.log(result))`.
+
 `validateStack` accepts generator stacks too — the schema properties are identical.
+
+## End of the chain
+
+If the last middleware in a stack calls `next()`, both `composeStack` and `composeGenStack` reject
+with `MiddlewareChainEndError`. Its message names that middleware (its `Name`, else its function
+name), and so does its `lastMiddleware` property. This usually means the layer that does the real
+work was left out of the stack.
+
+If reaching the end is intended, pass your own terminal:
+
+```typescript
+const executable = composeStack(stack, { terminal: async (req) => ({ handled: false, req }) });
+const genExecutable = composeGenStack(genStack, { terminal: (details, resolve) => resolve({}) });
+```
+
+## Upgrading from 1.0
+
+- **The end of the chain throws.** In 1.0, calling `next()` past the last middleware quietly
+  returned `{}`. It now rejects with `MiddlewareChainEndError`. To keep the old behavior, pass
+  `{ terminal: async () => ({}) }` to `composeStack`, or
+  `{ terminal: (_details, resolve) => resolve({}) }` to `composeGenStack`.
+- **`composeGenStack` returns a promise.** The executable now returns `Promise<Response>`, and the
+  `resolve` callback is optional. Errors thrown by any layer reject that promise instead of
+  becoming unhandled rejections. If you ignored the return value, a failing stack now surfaces
+  as an unhandled rejection of that promise: `await` it or attach `.catch()`.
+- **Errors in the callback stack are not catchable by outer layers.** The run rejects on the first
+  error from any layer, even if an outer middleware wraps `next()` in `try`/`catch`.
 
 ## API
 
 | Export | Purpose |
 | --- | --- |
-| `composeStack(stack)` | Fold a promise-based stack into a single `(request) => Promise<response>` |
-| `composeGenStack(stack)` | Fold a generator-style stack into `(request, resolve) => void` |
+| `composeStack(stack, { terminal }?)` | Fold a promise-based stack into a single `(request) => Promise<response>` |
+| `composeGenStack(stack, { terminal }?)` | Fold a generator-style stack into `(request, resolve?) => Promise<response>` |
 | `getFromRegistry(names, registry)` | Resolve named promise-based middlewares from a registry |
 | `getGenFromRegistry(names, registry)` | Resolve named generator middlewares from a registry |
 | `validateStack(stack, areEquivalent?)` | Check adjacent layers' schemas; returns `Error[]` |
 | `areTypesEquivalent(a, b)` | Default schema comparison (Zod 3 and Zod 4); replaceable |
+| `MiddlewareChainEndError` | Thrown when the last middleware calls `next()`; see [End of the chain](#end-of-the-chain) |
 
 Every middleware carries five optional annotation properties used by `validateStack`:
 `MyArgType`, `NextMiddlewareArg`, `NextMiddlewareReturnType`, `MyReturnType`, and `Name`.
